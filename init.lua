@@ -176,7 +176,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				if higher < base then
 					higher = base
 				end
-				local tblend = 0.5 + 0.5 * (hselect - 0.5) -- 0.2
+				local tblend = 0.5 + 0.5 * (hselect - 0.2)
 				tblend = math.min(math.max(tblend, 0), 1)
 				local tlevel = base * (1 - tblend) + higher * tblend + mudadd
 				local pathy = math.floor(math.max(tlevel, 4))
@@ -185,7 +185,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or (n_patha >= 0 and n_zprepatha < 0) or (n_patha < 0 and n_zprepatha >= 0)
 				or (n_pathb >= 0 and n_xprepathb < 0) or (n_pathb < 0 and n_xprepathb >= 0) -- pathb
 				or (n_pathb >= 0 and n_zprepathb < 0) or (n_pathb < 0 and n_zprepathb >= 0) then
-					local wood = true
+					local wood = true -- scan disk at path level for ground
 					for k = -1, 1 do
 						local vi = area:index(x-1, pathy, z+k)
 						for i = -1, 1 do
@@ -202,11 +202,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					end
 
+					local tunnel = false -- scan disk above path for stone
 					local excatop
-					local vi = area:index(x, pathy + 4, z) -- tunnel roof
-					local nodid = data[vi]
-					if nodid == c_stone
-					or nodid == c_destone then
+					for k = -1, 1 do
+						local vi = area:index(x-1, pathy+4, z+k)
+						for i = -1, 1 do
+							local nodid = data[vi]
+							if nodid == c_stone
+							or nodid == c_destone then
+								tunnel = true
+							end
+							vi = vi + 1
+						end
+					end
+					if tunnel then
 						excatop = pathy + 3 -- tunnel
 					else
 						excatop = y1 -- excavate to chunk top
