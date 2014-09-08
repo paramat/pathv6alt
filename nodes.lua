@@ -163,3 +163,139 @@ minetest.register_node("pathv6alt:stairsw", {
 	sounds = default.node_sound_wood_defaults(),
 })
 
+minetest.register_node("pathv6alt:pstairn", {
+	description = "Stair north",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, 0, 0.5, 0.5, 0.5},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstairs", {
+	description = "Stair south",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, -0.5, 0.5, 0.5, 0},
+		},
+	},
+	sounds = default.node_sound_wood_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstaire", {
+	description = "Stair east",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{0, 0, -0.5, 0.5, 0.5, 0.5},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstairw", {
+	description = "Stair west",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, -0.5, 0, 0.5, 0.5},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstairne", {
+	description = "Stair north east",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{0, 0, 0, 0.5, 0.5, 0.5},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstairnw", {
+	description = "Stair north west",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, 0, 0, 0.5, 0.5},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstairse", {
+	description = "Stair south east",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{0, 0, -0.5, 0.5, 0.5, 0},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("pathv6alt:pstairsw", {
+	description = "Stair south west",
+	tiles = {"pathv6alt_path.png"},
+	drawtype = "nodebox",
+	paramtype = "light",
+	is_ground_content = false,
+	groups = {crumbly=2},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			{-0.5, 0, -0.5, 0, 0.5, 0},
+		},
+	},
+	sounds = default.node_sound_dirt_defaults(),
+})
+

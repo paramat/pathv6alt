@@ -1,16 +1,18 @@
--- pathv6alt 0.2.0 by paramat
+-- pathv6alt 0.2.1 by paramat
 -- For latest stable Minetest and back to 0.4.8
 -- Depends default
 -- License: code WTFPL
 
--- 3 networks
--- path noise spread 1024
--- steepness 0.4
--- walkable paths
+-- walkable dirt path
+-- reduce height select persistence, not octaves
+-- increase steepness
+-- 4 path networks, varying spreads
 
 -- Parameters
 
 local WALK = true -- walkable paths
+local HSAMP = 0.9 -- Height select amplitude. Maximum steepness of paths
+local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
 
 -- 2D noise for base terrain
 
@@ -19,7 +21,7 @@ local np_base = {
 	scale = 20,
 	spread = {x=250, y=250, z=250},
 	seed = 82341,
-	octaves = 5, -- default = 5
+	octaves = 5,
 	persist = 0.6
 }
 
@@ -30,7 +32,7 @@ local np_higher = {
 	scale = 16,
 	spread = {x=500, y=500, z=500},
 	seed = 85039,
-	octaves = 5, -- default = 5
+	octaves = 5,
 	persist = 0.6
 }
 
@@ -41,8 +43,8 @@ local np_hselect = {
 	scale = 1,
 	spread = {x=250, y=250, z=250},
 	seed = 4213,
-	octaves = 4, -- default = 5
-	persist = 0.69
+	octaves = 5, -- default = 5
+	persist = 0.4 -- default = 0.69
 }
 
 -- 2D noise for mud
@@ -63,8 +65,8 @@ local np_patha = {
 	scale = 1,
 	spread = {x=1024, y=1024, z=1024},
 	seed = 11,
-	octaves = 4,
-	persist = 0.4
+	octaves = 3,
+	persist = 0.33
 }
 
 -- 2D noise for pathb
@@ -74,8 +76,8 @@ local np_pathb = {
 	scale = 1,
 	spread = {x=1024, y=1024, z=1024},
 	seed = -80033,
-	octaves = 4,
-	persist = 0.4
+	octaves = 3,
+	persist = 0.33
 }
 
 -- 2D noise for pathc
@@ -83,10 +85,21 @@ local np_pathb = {
 local np_pathc = {
 	offset = 0,
 	scale = 1,
-	spread = {x=1024, y=1024, z=1024},
+	spread = {x=2048, y=2048, z=2048},
 	seed = -80,
 	octaves = 4,
-	persist = 0.4
+	persist = 0.33
+}
+
+-- 2D noise for pathd
+
+local np_pathd = {
+	offset = 0,
+	scale = 1,
+	spread = {x=4096, y=4096, z=4096},
+	seed = 300707,
+	octaves = 5,
+	persist = 0.33
 }
 
 -- Stuff
@@ -126,6 +139,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_wood = minetest.get_content_id("pathv6alt:wood")
 	local c_path = minetest.get_content_id("pathv6alt:path")
 	local c_column = minetest.get_content_id("pathv6alt:tree")
+
 	local c_stairn = minetest.get_content_id("pathv6alt:stairn")
 	local c_stairs = minetest.get_content_id("pathv6alt:stairs")
 	local c_staire = minetest.get_content_id("pathv6alt:staire")
@@ -135,6 +149,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_stairse = minetest.get_content_id("pathv6alt:stairse")
 	local c_stairsw = minetest.get_content_id("pathv6alt:stairsw")
 	
+	local c_pstairn = minetest.get_content_id("pathv6alt:pstairn")
+	local c_pstairs = minetest.get_content_id("pathv6alt:pstairs")
+	local c_pstaire = minetest.get_content_id("pathv6alt:pstaire")
+	local c_pstairw = minetest.get_content_id("pathv6alt:pstairw")
+	local c_pstairne = minetest.get_content_id("pathv6alt:pstairne")
+	local c_pstairnw = minetest.get_content_id("pathv6alt:pstairnw")
+	local c_pstairse = minetest.get_content_id("pathv6alt:pstairse")
+	local c_pstairsw = minetest.get_content_id("pathv6alt:pstairsw")
+
 	local sidelen = x1 - x0 + 1
 	local overlen = sidelen + 1
 	local emerlen = sidelen + 32 -- voxelmanip emerged volume edge length for vvii
@@ -149,6 +172,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local nvals_patha = minetest.get_perlin_map(np_patha, chulens):get2dMap_flat(minpos)
 	local nvals_pathb = minetest.get_perlin_map(np_pathb, chulens):get2dMap_flat(minpos)
 	local nvals_pathc = minetest.get_perlin_map(np_pathc, chulens):get2dMap_flat(minpos)
+	local nvals_pathd = minetest.get_perlin_map(np_pathd, chulens):get2dMap_flat(minpos)
 	
 	local ni = 1
 	local stable = {}
@@ -156,6 +180,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local n_xprepatha = false
 		local n_xprepathb = false
 		local n_xprepathc = false
+		local n_xprepathd = false
 		for x = x0 - 1, x1 do
 			local chunk = x >= x0 and z >= z0
 
@@ -168,15 +193,18 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local n_pathc = nvals_pathc[ni]
 			local n_zprepathc = nvals_pathc[(ni - overlen)]
 
+			local n_pathd = nvals_pathd[ni]
+			local n_zprepathd = nvals_pathd[(ni - overlen)]
+
 			if chunk then
-				local base = nvals_base[ni] + 1
-				local higher = nvals_higher[ni] + 1
+				local base = nvals_base[ni]
+				local higher = nvals_higher[ni]
 				local hselect = nvals_hselect[ni]
 				local mudadd = nvals_mud[ni] / 2 + 0.5
 				if higher < base then
 					higher = base
 				end
-				local tblend = 0.5 + 0.4 * (hselect - 0.2)
+				local tblend = 0.5 + HSAMP * (hselect + HSOFF)
 				tblend = math.min(math.max(tblend, 0), 1)
 				local tlevel = base * (1 - tblend) + higher * tblend + mudadd
 				local pathy = math.floor(math.max(tlevel, 4))
@@ -186,7 +214,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or (n_pathb >= 0 and n_xprepathb < 0) or (n_pathb < 0 and n_xprepathb >= 0) -- pathb
 				or (n_pathb >= 0 and n_zprepathb < 0) or (n_pathb < 0 and n_zprepathb >= 0)
 				or (n_pathc >= 0 and n_xprepathc < 0) or (n_pathc < 0 and n_xprepathc >= 0) -- pathc
-				or (n_pathc >= 0 and n_zprepathc < 0) or (n_pathc < 0 and n_zprepathc >= 0) then
+				or (n_pathc >= 0 and n_zprepathc < 0) or (n_pathc < 0 and n_zprepathc >= 0)
+				or (n_pathd >= 0 and n_xprepathd < 0) or (n_pathd < 0 and n_xprepathd >= 0) -- pathd
+				or (n_pathd >= 0 and n_zprepathd < 0) or (n_pathd < 0 and n_zprepathd >= 0) then
 					local wood = true -- scan disk at path level for ground
 					for k = -1, 1 do
 						local vi = area:index(x-1, pathy, z+k)
@@ -224,43 +254,97 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					end
 
 					if WALK then
-						local vi = area:index(x-1, pathy, z-1)
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairne
-						end
-						vi = vi + 1
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairn
-						end
-						vi = vi + 1
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairnw
-						end
+						if wood then
+							local vi = area:index(x-1, pathy, z-1)
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairne
+							end
+							vi = vi + 1
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairn
+							end
+							vi = vi + 1
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairnw
+							end
 
-						local vi = area:index(x-1, pathy, z)
-						if data[vi] ~= c_wood then
-							data[vi] = c_staire
-						end
-						vi = vi + 1
-						data[vi] = c_wood
-						vi = vi + 1
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairw
-						end
+							local vi = area:index(x-1, pathy, z)
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_staire
+							end
+							vi = vi + 1
+							data[vi] = c_wood
+							vi = vi + 1
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairw
+							end
 
-						local vi = area:index(x-1, pathy, z+1)
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairse
-						end
-						vi = vi + 1
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairs
-						end
-						vi = vi + 1
-						if data[vi] ~= c_wood then
-							data[vi] = c_stairsw
-						end
+							local vi = area:index(x-1, pathy, z+1)
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairse
+							end
+							vi = vi + 1
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairs
+							end
+							vi = vi + 1
+							if data[vi] ~= c_wood
+							and data[vi] ~= c_path then
+								data[vi] = c_stairsw
+							end
+						else
+							local vi = area:index(x-1, pathy, z-1)
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairne
+							end
+							vi = vi + 1
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairn
+							end
+							vi = vi + 1
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairnw
+							end
 
+							local vi = area:index(x-1, pathy, z)
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstaire
+							end
+							vi = vi + 1
+							data[vi] = c_path
+							vi = vi + 1
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairw
+							end
+
+							local vi = area:index(x-1, pathy, z+1)
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairse
+							end
+							vi = vi + 1
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairs
+							end
+							vi = vi + 1
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
+								data[vi] = c_pstairsw
+							end
+						end
 						for y = pathy + 1, excatop do
 							for k = -1, 1 do
 								local vi = area:index(x-1, y, z+k)
@@ -275,14 +359,22 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									and nodid ~= c_stairne
 									and nodid ~= c_stairnw
 									and nodid ~= c_stairse
-									and nodid ~= c_stairsw then
+									and nodid ~= c_stairsw
+									and nodid ~= c_pstairn
+									and nodid ~= c_pstairs
+									and nodid ~= c_pstaire
+									and nodid ~= c_pstairw
+									and nodid ~= c_pstairne
+									and nodid ~= c_pstairnw
+									and nodid ~= c_pstairse
+									and nodid ~= c_pstairsw then
 										data[vi] = c_air
 									end
 									vi = vi + 1
 								end
 							end
 						end
-					else
+					else -- non walkable option
 						for y = pathy, excatop do
 							for k = -1, 1 do
 								local vi = area:index(x-1, y, z+k)
@@ -308,8 +400,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						for y = pathy - 1, y0, -1 do
 							local nodid = data[vi]
 							if nodid == c_stone
-							or nodid == c_destone
-							or nodid == c_tree then
+							or nodid == c_destone then
 								break
 							else
 								data[vi] = c_column
@@ -323,6 +414,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			n_xprepatha = n_patha
 			n_xprepathb = n_pathb
 			n_xprepathc = n_pathc
+			n_xprepathd = n_pathd
 			ni = ni + 1
 		end
 	end
