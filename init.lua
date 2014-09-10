@@ -1,15 +1,17 @@
--- pathv6alt 0.2.2 by paramat
+-- pathv6alt 0.2.3 by paramat
 -- For latest stable Minetest and back to 0.4.8
 -- Depends default
 -- License: code WTFPL
 
--- 5 wide roads in progress
--- larger spreads up to 8192
+-- reduce steepness to 0.8
+-- finish wide walkable dirt paths
+-- quad column pattern for wide paths
+-- scan for air to avoid dirt bridges
 
 -- Parameters
 
 local WALK = true -- walkable paths
-local HSAMP = 0.9 -- Height select amplitude. Maximum steepness of paths
+local HSAMP = 0.8 -- Height select amplitude. Maximum steepness of paths
 local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
 
 -- 2D noise for base terrain
@@ -126,6 +128,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local data = vm:get_data()
 	
 	local c_air = minetest.get_content_id("air")
+	local c_ignore = minetest.get_content_id("ignore")
 	local c_tree = minetest.get_content_id("default:tree")
 	local c_sand = minetest.get_content_id("default:sand")
 	local c_dirt = minetest.get_content_id("default:dirt")
@@ -211,18 +214,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or (n_patha >= 0 and n_zprepatha < 0) or (n_patha < 0 and n_zprepatha >= 0)
 				or (n_pathb >= 0 and n_xprepathb < 0) or (n_pathb < 0 and n_xprepathb >= 0) -- pathb
 				or (n_pathb >= 0 and n_zprepathb < 0) or (n_pathb < 0 and n_zprepathb >= 0) then
-					local wood = true -- scan disk at path level for ground
+					local wood = false -- scan disk at path level for air
 					for k = -1, 1 do
 						local vi = area:index(x-1, pathy, z+k)
 						for i = -1, 1 do
 							local nodid = data[vi]
-							if nodid == c_sand
-							or nodid == c_desand
-							or nodid == c_dirt
-							or nodid == c_grass
-							or nodid == c_stone
-							or nodid == c_destone then
-								wood = false
+							if nodid == c_air
+							or nodid == c_ignore then
+								wood = true
 							end
 							vi = vi + 1
 						end
@@ -406,18 +405,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or (n_pathc >= 0 and n_zprepathc < 0) or (n_pathc < 0 and n_zprepathc >= 0)
 				or (n_pathd >= 0 and n_xprepathd < 0) or (n_pathd < 0 and n_xprepathd >= 0) -- pathd
 				or (n_pathd >= 0 and n_zprepathd < 0) or (n_pathd < 0 and n_zprepathd >= 0) then
-					local wood = true -- scan disk at path level for ground
+					local wood = false -- scan disk at path level for air
 					for k = -2, 2 do
 						local vi = area:index(x-2, pathy, z+k)
 						for i = -2, 2 do
 							local nodid = data[vi]
-							if nodid == c_sand
-							or nodid == c_desand
-							or nodid == c_dirt
-							or nodid == c_grass
-							or nodid == c_stone
-							or nodid == c_destone then
-								wood = false
+							if nodid == c_air
+							or nodid == c_ignore then
+								wood = true
 							end
 							vi = vi + 1
 						end
@@ -436,6 +431,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							vi = vi + 1
 						end
 					end
+
 					if tunnel then
 						excatop = pathy + 4 -- tunnel
 					else
@@ -445,111 +441,69 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					if WALK then
 						if wood then
 							local vi = area:index(x-2, pathy, z-2)
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
 								data[vi] = c_stairne
 							end
-							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairn
+							for iter = 1, 3 do
+								vi = vi + 1
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_stairn
+								end
 							end
 							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairn
-							end
-							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairn
-							end
-							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
 								data[vi] = c_stairnw
 							end
 
-							local vi = area:index(x-2, pathy, z-1)
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_staire
-							end
-							vi = vi + 1
-							for iter = 1, 3 do
-								data[vi] = c_wood
+							for k = -1, 1 do
+								local vi = area:index(x-2, pathy, z+k)
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_staire
+								end
+								for iter = 1, 3 do
+									vi = vi + 1
+									data[vi] = c_wood
+								end
 								vi = vi + 1
-							end
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairw
-							end
-
-							local vi = area:index(x-2, pathy, z)
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_staire
-							end
-							vi = vi + 1
-							for iter = 1, 3 do
-								data[vi] = c_wood
-								vi = vi + 1
-							end
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairw
-							end
-
-							local vi = area:index(x-2, pathy, z+1)
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_staire
-							end
-							vi = vi + 1
-							for iter = 1, 3 do
-								data[vi] = c_wood
-								vi = vi + 1
-							end
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairw
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_stairw
+								end
 							end
 
 							local vi = area:index(x-2, pathy, z+2)
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
 								data[vi] = c_stairse
 							end
-							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairs
+							for iter = 1, 3 do
+								vi = vi + 1
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_stairs
+								end
 							end
 							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairs
-							end
-							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
-								data[vi] = c_stairs
-							end
-							vi = vi + 1
-							if data[vi] ~= c_wood
-							and data[vi] ~= c_path then
+							if data[vi] ~= c_path
+							and data[vi] ~= c_wood then
 								data[vi] = c_stairsw
 							end
 						else
-							local vi = area:index(x-1, pathy, z-1)
+							local vi = area:index(x-2, pathy, z-2)
 							if data[vi] ~= c_path
 							and data[vi] ~= c_wood then
 								data[vi] = c_pstairne
 							end
-							vi = vi + 1
-							if data[vi] ~= c_path
-							and data[vi] ~= c_wood then
-								data[vi] = c_pstairn
+							for iter = 1, 3 do
+								vi = vi + 1
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_pstairn
+								end
 							end
 							vi = vi + 1
 							if data[vi] ~= c_path
@@ -557,28 +511,34 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								data[vi] = c_pstairnw
 							end
 
-							local vi = area:index(x-1, pathy, z)
-							if data[vi] ~= c_path
-							and data[vi] ~= c_wood then
-								data[vi] = c_pstaire
-							end
-							vi = vi + 1
-							data[vi] = c_path
-							vi = vi + 1
-							if data[vi] ~= c_path
-							and data[vi] ~= c_wood then
-								data[vi] = c_pstairw
+							for k = -1, 1 do
+								local vi = area:index(x-2, pathy, z+k)
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_pstaire
+								end
+								for iter = 1, 3 do
+									vi = vi + 1
+									data[vi] = c_path
+								end
+								vi = vi + 1
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_pstairw
+								end
 							end
 
-							local vi = area:index(x-1, pathy, z+1)
+							local vi = area:index(x-2, pathy, z+2)
 							if data[vi] ~= c_path
 							and data[vi] ~= c_wood then
 								data[vi] = c_pstairse
 							end
-							vi = vi + 1
-							if data[vi] ~= c_path
-							and data[vi] ~= c_wood then
-								data[vi] = c_pstairs
+							for iter = 1, 3 do
+								vi = vi + 1
+								if data[vi] ~= c_path
+								and data[vi] ~= c_wood then
+									data[vi] = c_pstairs
+								end
 							end
 							vi = vi + 1
 							if data[vi] ~= c_path
@@ -586,6 +546,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								data[vi] = c_pstairsw
 							end
 						end
+
 						for y = pathy + 1, excatop do
 							for k = -2, 2 do
 								local vi = area:index(x-2, y, z+k)
@@ -638,17 +599,21 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 					end
 
-					if wood and math.random() < 0.25 then
-						local vi = area:index(x, pathy - 1, z)
-						for y = pathy - 1, y0, -1 do
-							local nodid = data[vi]
-							if nodid == c_stone
-							or nodid == c_destone then
-								break
-							else
-								data[vi] = c_column
+					if wood and math.random() < 0.2 then
+						for i = -1, 1, 2 do
+						for k = -1, 1, 2 do
+							local vi = area:index(x+i, pathy-1, z+k)
+							for y = pathy - 1, y0, -1 do
+								local nodid = data[vi]
+								if nodid == c_stone
+								or nodid == c_destone then
+									break
+								else
+									data[vi] = c_column
+								end
+								vi = vi - emerlen
 							end
-							vi = vi - emerlen
+						end
 						end
 					end
 				end
