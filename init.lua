@@ -1,17 +1,15 @@
--- pathv6alt 0.2.3 by paramat
+-- pathv6alt 0.2.4 by paramat
 -- For latest stable Minetest and back to 0.4.8
 -- Depends default
 -- License: code WTFPL
 
--- reduce steepness to 0.8
--- finish wide walkable dirt paths
--- quad column pattern for wide paths
--- scan for air to avoid dirt bridges
+-- return to scanning for ground: more dirt paths
+-- tune steepness to 0.85
 
 -- Parameters
 
 local WALK = true -- walkable paths
-local HSAMP = 0.8 -- Height select amplitude. Maximum steepness of paths
+local HSAMP = 0.85 -- Height select amplitude. Maximum steepness of paths
 local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
 
 -- 2D noise for base terrain
@@ -214,14 +212,18 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or (n_patha >= 0 and n_zprepatha < 0) or (n_patha < 0 and n_zprepatha >= 0)
 				or (n_pathb >= 0 and n_xprepathb < 0) or (n_pathb < 0 and n_xprepathb >= 0) -- pathb
 				or (n_pathb >= 0 and n_zprepathb < 0) or (n_pathb < 0 and n_zprepathb >= 0) then
-					local wood = false -- scan disk at path level for air
+					local wood = true -- scan disk at path level for ground
 					for k = -1, 1 do
 						local vi = area:index(x-1, pathy, z+k)
 						for i = -1, 1 do
 							local nodid = data[vi]
-							if nodid == c_air
-							or nodid == c_ignore then
-								wood = true
+							if nodid == c_sand
+							or nodid == c_desand
+							or nodid == c_dirt
+							or nodid == c_grass
+							or nodid == c_stone
+							or nodid == c_destone then
+								wood = false -- use dirt path node
 							end
 							vi = vi + 1
 						end
@@ -405,14 +407,18 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				or (n_pathc >= 0 and n_zprepathc < 0) or (n_pathc < 0 and n_zprepathc >= 0)
 				or (n_pathd >= 0 and n_xprepathd < 0) or (n_pathd < 0 and n_xprepathd >= 0) -- pathd
 				or (n_pathd >= 0 and n_zprepathd < 0) or (n_pathd < 0 and n_zprepathd >= 0) then
-					local wood = false -- scan disk at path level for air
+					local wood = true -- scan disk at path level for ground
 					for k = -2, 2 do
 						local vi = area:index(x-2, pathy, z+k)
 						for i = -2, 2 do
 							local nodid = data[vi]
-							if nodid == c_air
-							or nodid == c_ignore then
-								wood = true
+							if nodid == c_sand
+							or nodid == c_desand
+							or nodid == c_dirt
+							or nodid == c_grass
+							or nodid == c_stone
+							or nodid == c_destone then
+								wood = false
 							end
 							vi = vi + 1
 						end
