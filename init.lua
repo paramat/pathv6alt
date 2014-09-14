@@ -1,16 +1,17 @@
--- pathv6alt 0.2.4 by paramat
+-- pathv6alt 0.2.5 by paramat
 -- For latest stable Minetest and back to 0.4.8
 -- Depends default
 -- License: code WTFPL
 
--- return to scanning for ground: more dirt paths
--- tune steepness to 0.85
+-- generate paths outside chunk to avoid mudflow
 
 -- Parameters
 
 local WALK = true -- walkable paths
 local HSAMP = 0.85 -- Height select amplitude. Maximum steepness of paths
 local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
+
+-- Mapgen v6 parameters
 
 -- 2D noise for base terrain
 
@@ -41,7 +42,7 @@ local np_hselect = {
 	scale = 1,
 	spread = {x=250, y=250, z=250},
 	seed = 4213,
-	octaves = 5, -- default = 5
+	octaves = 5,
 	persist = 0.4 -- default = 0.69
 }
 
@@ -55,6 +56,8 @@ local np_mud = {
 	octaves = 3,
 	persist = 0.55
 }
+
+-- Mod path parameters
 
 -- 2D noise for patha
 
@@ -158,15 +161,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_pstairsw = minetest.get_content_id("pathv6alt:pstairsw")
 
 	local sidelen = x1 - x0 + 1
-	local overlen = sidelen + 1
+	local overlen = sidelen + 5 -- noisemap x, z from minp-3 to maxp+2
 	local emerlen = sidelen + 32 -- voxelmanip emerged volume edge length for vvii
-	local chulens = {x=overlen, y=overlen, z=sidelen} 
-	local minpos = {x=x0-1, y=z0-1}
+	local chulens = {x=overlen, y=overlen, z=sidelen}
+	local minpos = {x=x0-3, y=z0-3}
 
-	local nvals_base = minetest.get_perlin_map(np_base, chulens):get2dMap_flat({x=x0+124, y=z0+124}) -- offsets - 1
-	local nvals_higher = minetest.get_perlin_map(np_higher, chulens):get2dMap_flat({x=x0+249, y=z0+249})
-	local nvals_hselect = minetest.get_perlin_map(np_hselect, chulens):get2dMap_flat({x=x0+124, y=z0+124})
-	local nvals_mud = minetest.get_perlin_map(np_mud, chulens):get2dMap_flat({x=x0+99, y=z0+99})
+	local nvals_base = minetest.get_perlin_map(np_base, chulens):get2dMap_flat({x=x0+122, y=z0+122}) -- noisemap offsets - 3
+	local nvals_higher = minetest.get_perlin_map(np_higher, chulens):get2dMap_flat({x=x0+247, y=z0+247})
+	local nvals_hselect = minetest.get_perlin_map(np_hselect, chulens):get2dMap_flat({x=x0+122, y=z0+122})
+	local nvals_mud = minetest.get_perlin_map(np_mud, chulens):get2dMap_flat({x=x0+97, y=z0+97})
 
 	local nvals_patha = minetest.get_perlin_map(np_patha, chulens):get2dMap_flat(minpos)
 	local nvals_pathb = minetest.get_perlin_map(np_pathb, chulens):get2dMap_flat(minpos)
@@ -175,13 +178,13 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	
 	local ni = 1
 	local stable = {}
-	for z = z0 - 1, z1 do
+	for z = z0 - 3, z1 + 2 do
 		local n_xprepatha = false
 		local n_xprepathb = false
 		local n_xprepathc = false
 		local n_xprepathd = false
-		for x = x0 - 1, x1 do
-			local chunk = x >= x0 and z >= z0
+		for x = x0 - 3, x1 + 2 do -- x0-3, z0-3 is to setup initial values of 'xprepath_', 'zprepath_'
+			local pathgen = x >= x0 - 2 and z >= z0 - 2 -- paths overgenerate by 2 nodes to erase mudflow griefing
 
 			local n_patha = nvals_patha[ni]
 			local n_zprepatha = nvals_patha[(ni - overlen)]
@@ -195,7 +198,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local n_pathd = nvals_pathd[ni]
 			local n_zprepathd = nvals_pathd[(ni - overlen)]
 
-			if chunk then
+			if pathgen then
 				local base = nvals_base[ni]
 				local higher = nvals_higher[ni]
 				local hselect = nvals_hselect[ni]
