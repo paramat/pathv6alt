@@ -1,19 +1,18 @@
--- pathv6alt 0.2.6 by paramat
+-- pathv6alt 0.2.7 by paramat
 -- For latest stable Minetest and back to 0.4.8
 -- Depends default
 -- License: code WTFPL
 
--- compatible with higher terrains
--- TODO
--- bridge spine structure between columns
+-- add bridge structure of mod junglewood
+-- bugfix floating wide dirt paths
 
 -- Parameters
 
 local WALK = true -- Walkable paths
-local YMAXMINP = 128 -- Maximum minp.y of generated chunks (-32 for default mapgen v6. 48, 128, 208 for higher)
+local YMAXMINP = 48 -- Maximum minp.y of generated chunks (-32 for default mapgen v6. 48, 128, 208 for higher)
 local HSAMP = 0.85 -- Height select amplitude. Maximum steepness of paths
 local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
-local TCOL = 0.5 -- Column noise threshold. Column density
+local TCOL = 0.2 -- Column noise threshold. Bridge column density
 
 -- Mapgen v6 parameters
 
@@ -151,7 +150,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local c_wood = minetest.get_content_id("pathv6alt:wood")
 	local c_path = minetest.get_content_id("pathv6alt:path")
-	local c_column = minetest.get_content_id("pathv6alt:tree")
+	local c_column = minetest.get_content_id("pathv6alt:junglewood")
 
 	local c_stairn = minetest.get_content_id("pathv6alt:stairn")
 	local c_stairs = minetest.get_content_id("pathv6alt:stairs")
@@ -224,7 +223,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local tblend = 0.5 + HSAMP * (hselect + HSOFF)
 				tblend = math.min(math.max(tblend, 0), 1)
 				local tlevel = base * (1 - tblend) + higher * tblend + mudadd
-				local pathy = math.floor(math.max(tlevel, 4))
+				local pathy = math.floor(math.max(tlevel, 6))
 
 				if (n_patha >= 0 and n_xprepatha < 0) or (n_patha < 0 and n_xprepatha >= 0) -- patha
 				or (n_patha >= 0 and n_zprepatha < 0) or (n_patha < 0 and n_zprepatha >= 0)
@@ -373,6 +372,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_pstairsw
 								end
 							end
+
 							for y = pathy + 1, excatop do
 								for k = -1, 1 do
 									local vi = area:index(x-1, y, z+k)
@@ -414,7 +414,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 											else
 												data[vi] = c_path
 											end
-										elseif nodid ~= c_wood and nodid ~= c_path then
+										elseif nodid ~= c_wood
+										and nodid ~= c_path then
 											data[vi] = c_air
 										end
 										vi = vi + 1
@@ -423,17 +424,24 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 
-						if wood and abscol < TCOL then
-							local vi = area:index(x, pathy - 1, z)
-							for y = pathy - 1, y0, -1 do
-								local nodid = data[vi]
-								if nodid == c_stone
-								or nodid == c_destone then
-									break
-								else
-									data[vi] = c_column
+						if wood then
+							local vi = area:index(x, pathy - 1, z) -- bridge structure
+							data[vi] = c_column
+							vi = vi - emerlen
+							data[vi] = c_column
+
+							if abscol < TCOL then -- columns
+								local vi = area:index(x, pathy - 3, z)
+								for y = pathy - 3, y0, -1 do
+									local nodid = data[vi]
+									if nodid == c_stone
+									or nodid == c_destone then
+										break
+									else
+										data[vi] = c_column
+									end
+									vi = vi - emerlen
 								end
-								vi = vi - emerlen
 							end
 						end
 					end
@@ -460,6 +468,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					elseif pathy >= y0 then -- path in chunk, place path node brush
+						local wood = true -- scan disk at path level for ground
 						for k = -2, 2 do
 							local vi = area:index(x-2, pathy, z+k)
 							for i = -2, 2 do
@@ -647,7 +656,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 												else
 													data[vi] = c_path
 												end
-											elseif nodid ~= c_wood and nodid ~= c_path then
+											elseif nodid ~= c_wood
+											and nodid ~= c_path then
 												data[vi] = c_air
 											end
 										end
@@ -657,21 +667,35 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 
-						if wood and abscol < TCOL then
-							for i = -1, 1, 2 do
-							for k = -1, 1, 2 do
-								local vi = area:index(x+i, pathy-1, z+k)
-								for y = pathy - 1, y0, -1 do
-									local nodid = data[vi]
-									if nodid == c_stone
-									or nodid == c_destone then
-										break
-									else
+						if wood then
+							for i = -1, 1 do -- bridge structure
+							for k = -1, 1 do
+								if not (i == 0 and k == 0) then
+									local vi = area:index(x+i, pathy-1, z+k)
+									for y = 1, 2 do
 										data[vi] = c_column
+										vi = vi - emerlen
 									end
-									vi = vi - emerlen
 								end
 							end
+							end
+
+							if abscol < TCOL then -- columns
+								for i = -1, 1, 2 do
+								for k = -1, 1, 2 do
+									local vi = area:index(x+i, pathy-3, z+k)
+									for y = pathy - 3, y0, -1 do
+										local nodid = data[vi]
+										if nodid == c_stone
+										or nodid == c_destone then
+											break
+										else
+											data[vi] = c_column
+										end
+										vi = vi - emerlen
+									end
+								end
+								end
 							end
 						end
 					end

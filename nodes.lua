@@ -1,5 +1,5 @@
 minetest.register_node("pathv6alt:wood", {
-	description = "Path Planks",
+	description = "Mod wood",
 	tiles = {"default_wood.png"},
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
@@ -8,7 +8,7 @@ minetest.register_node("pathv6alt:wood", {
 })
 
 minetest.register_node("pathv6alt:path", {
-	description = "Path",
+	description = "Dirt path",
 	tiles = {"pathv6alt_path.png"},
 	is_ground_content = false,
 	groups = {crumbly=2},
@@ -16,15 +16,13 @@ minetest.register_node("pathv6alt:path", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
-minetest.register_node("pathv6alt:tree", {
-	description = "Tree",
-	tiles = {"default_tree_top.png", "default_tree_top.png", "default_tree.png"},
-	paramtype2 = "facedir",
+minetest.register_node("pathv6alt:junglewood", {
+	description = "Mod junglewood",
+	tiles = {"default_junglewood.png"},
 	is_ground_content = false,
-	groups = {tree=1,choppy=2,oddly_breakable_by_hand=1,flammable=2},
-	drop = "default:tree",
+	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "default:junglewood",
 	sounds = default.node_sound_wood_defaults(),
-	on_place = minetest.rotate_node
 })
 
 minetest.register_node("pathv6alt:stairn", {
