@@ -1,10 +1,10 @@
--- pathv6alt 0.2.7 by paramat
+-- pathv6alt 0.2.8 by paramat
 -- For latest stable Minetest and back to 0.4.8
--- Depends default
+-- Depends default stairs
 -- License: code WTFPL
 
--- add bridge structure of mod junglewood
--- bugfix floating wide dirt paths
+-- new node dark bridgewood, drops default wood.
+-- mod stair nodes drop default nodes
 
 -- Parameters
 
@@ -12,7 +12,7 @@ local WALK = true -- Walkable paths
 local YMAXMINP = 48 -- Maximum minp.y of generated chunks (-32 for default mapgen v6. 48, 128, 208 for higher)
 local HSAMP = 0.85 -- Height select amplitude. Maximum steepness of paths
 local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
-local TCOL = 0.2 -- Column noise threshold. Bridge column density
+local TCOL = 0.3 -- Column noise threshold. Bridge column density
 
 -- Mapgen v6 parameters
 
@@ -114,7 +114,7 @@ local np_column = {
 	spread = {x=8, y=8, z=8},
 	seed = 1728833,
 	octaves = 3,
-	persist = 1.5
+	persist = 2
 }
 
 -- Stuff
@@ -150,7 +150,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local c_wood = minetest.get_content_id("pathv6alt:wood")
 	local c_path = minetest.get_content_id("pathv6alt:path")
-	local c_column = minetest.get_content_id("pathv6alt:junglewood")
+	local c_column = minetest.get_content_id("pathv6alt:bridgewood")
 
 	local c_stairn = minetest.get_content_id("pathv6alt:stairn")
 	local c_stairs = minetest.get_content_id("pathv6alt:stairs")

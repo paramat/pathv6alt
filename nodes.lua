@@ -16,12 +16,12 @@ minetest.register_node("pathv6alt:path", {
 	sounds = default.node_sound_dirt_defaults(),
 })
 
-minetest.register_node("pathv6alt:junglewood", {
-	description = "Mod junglewood",
-	tiles = {"default_junglewood.png"},
+minetest.register_node("pathv6alt:bridgewood", {
+	description = "Bridge wood",
+	tiles = {"pathv6alt_bridgewood.png"},
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
-	drop = "default:junglewood",
+	drop = "default:wood",
 	sounds = default.node_sound_wood_defaults(),
 })
 
@@ -32,6 +32,7 @@ minetest.register_node("pathv6alt:stairn", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -49,6 +50,7 @@ minetest.register_node("pathv6alt:stairs", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -66,6 +68,7 @@ minetest.register_node("pathv6alt:staire", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -83,6 +86,7 @@ minetest.register_node("pathv6alt:stairw", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -100,6 +104,7 @@ minetest.register_node("pathv6alt:stairne", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -117,6 +122,7 @@ minetest.register_node("pathv6alt:stairnw", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -134,6 +140,7 @@ minetest.register_node("pathv6alt:stairse", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -151,6 +158,7 @@ minetest.register_node("pathv6alt:stairsw", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	drop = "stairs:stair_wood",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -168,6 +176,7 @@ minetest.register_node("pathv6alt:pstairn", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -185,6 +194,7 @@ minetest.register_node("pathv6alt:pstairs", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -202,6 +212,7 @@ minetest.register_node("pathv6alt:pstaire", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -219,6 +230,7 @@ minetest.register_node("pathv6alt:pstairw", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -236,6 +248,7 @@ minetest.register_node("pathv6alt:pstairne", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -253,6 +266,7 @@ minetest.register_node("pathv6alt:pstairnw", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -270,6 +284,7 @@ minetest.register_node("pathv6alt:pstairse", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -287,6 +302,7 @@ minetest.register_node("pathv6alt:pstairsw", {
 	paramtype = "light",
 	is_ground_content = false,
 	groups = {crumbly=2},
+	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
 		fixed = {
