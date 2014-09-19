@@ -1,10 +1,11 @@
--- pathv6alt 0.2.8 by paramat
+-- pathv6alt 0.2.9 by paramat
 -- For latest stable Minetest and back to 0.4.8
 -- Depends default stairs
 -- License: code WTFPL
 
--- new node dark bridgewood, drops default wood.
--- mod stair nodes drop default nodes
+-- junglewood bridge boards
+-- mod nodes do not drop default nodes
+-- Stabilise tunnel roof: dirt/sand to stone
 
 -- Parameters
 
@@ -148,7 +149,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local c_stone = minetest.get_content_id("default:stone")
 	local c_destone = minetest.get_content_id("default:desert_stone")
 
-	local c_wood = minetest.get_content_id("pathv6alt:wood")
+	local c_wood = minetest.get_content_id("pathv6alt:junglewood")
 	local c_path = minetest.get_content_id("pathv6alt:path")
 	local c_column = minetest.get_content_id("pathv6alt:bridgewood")
 
@@ -275,7 +276,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 						if tunnel then
-							excatop = pathy + 4 -- tunnel
+							excatop = pathy + 5 -- tunnel
 						else
 							excatop = y1 -- excavate to chunk top
 						end
@@ -378,25 +379,34 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									local vi = area:index(x-1, y, z+k)
 									for i = -1, 1 do
 										local nodid = data[vi]
-										if nodid ~= c_wood
-										and nodid ~= c_path
-										and nodid ~= c_stairn
-										and nodid ~= c_stairs
-										and nodid ~= c_staire
-										and nodid ~= c_stairw
-										and nodid ~= c_stairne
-										and nodid ~= c_stairnw
-										and nodid ~= c_stairse
-										and nodid ~= c_stairsw
-										and nodid ~= c_pstairn
-										and nodid ~= c_pstairs
-										and nodid ~= c_pstaire
-										and nodid ~= c_pstairw
-										and nodid ~= c_pstairne
-										and nodid ~= c_pstairnw
-										and nodid ~= c_pstairse
-										and nodid ~= c_pstairsw then
-											data[vi] = c_air
+										if y == excatop then
+											if nodid == c_dirt
+											or nodid == c_grass then
+												data[vi] = c_stone
+											elseif nodid == c_desand then
+												data[vi] = c_destone
+											end
+										else
+											if nodid ~= c_wood
+											and nodid ~= c_path
+											and nodid ~= c_stairn
+											and nodid ~= c_stairs
+											and nodid ~= c_staire
+											and nodid ~= c_stairw
+											and nodid ~= c_stairne
+											and nodid ~= c_stairnw
+											and nodid ~= c_stairse
+											and nodid ~= c_stairsw
+											and nodid ~= c_pstairn
+											and nodid ~= c_pstairs
+											and nodid ~= c_pstaire
+											and nodid ~= c_pstairw
+											and nodid ~= c_pstairne
+											and nodid ~= c_pstairnw
+											and nodid ~= c_pstairse
+											and nodid ~= c_pstairsw then
+												data[vi] = c_air
+											end
 										end
 										vi = vi + 1
 									end
@@ -500,7 +510,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						end
 
 						if tunnel then
-							excatop = pathy + 4 -- tunnel
+							excatop = pathy + 5 -- tunnel
 						else
 							excatop = y1 -- excavate to chunk top
 						end
@@ -619,25 +629,34 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									local vi = area:index(x-2, y, z+k)
 									for i = -2, 2 do
 										local nodid = data[vi]
-										if nodid ~= c_wood
-										and nodid ~= c_path
-										and nodid ~= c_stairn
-										and nodid ~= c_stairs
-										and nodid ~= c_staire
-										and nodid ~= c_stairw
-										and nodid ~= c_stairne
-										and nodid ~= c_stairnw
-										and nodid ~= c_stairse
-										and nodid ~= c_stairsw
-										and nodid ~= c_pstairn
-										and nodid ~= c_pstairs
-										and nodid ~= c_pstaire
-										and nodid ~= c_pstairw
-										and nodid ~= c_pstairne
-										and nodid ~= c_pstairnw
-										and nodid ~= c_pstairse
-										and nodid ~= c_pstairsw then
-											data[vi] = c_air
+										if y == excatop then
+											if nodid == c_dirt
+											or nodid == c_grass then
+												data[vi] = c_stone
+											elseif nodid == c_desand then
+												data[vi] = c_destone
+											end
+										else
+											if nodid ~= c_wood
+											and nodid ~= c_path
+											and nodid ~= c_stairn
+											and nodid ~= c_stairs
+											and nodid ~= c_staire
+											and nodid ~= c_stairw
+											and nodid ~= c_stairne
+											and nodid ~= c_stairnw
+											and nodid ~= c_stairse
+											and nodid ~= c_stairsw
+											and nodid ~= c_pstairn
+											and nodid ~= c_pstairs
+											and nodid ~= c_pstaire
+											and nodid ~= c_pstairw
+											and nodid ~= c_pstairne
+											and nodid ~= c_pstairnw
+											and nodid ~= c_pstairse
+											and nodid ~= c_pstairsw then
+												data[vi] = c_air
+											end
 										end
 										vi = vi + 1
 									end
