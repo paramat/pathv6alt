@@ -1,19 +1,13 @@
--- pathv6alt 0.2.9 by paramat
--- For latest stable Minetest and back to 0.4.8
--- Depends default stairs
--- License: code WTFPL
-
--- junglewood bridge boards
--- mod nodes do not drop default nodes
--- Stabilise tunnel roof: dirt/sand to stone
-
 -- Parameters
 
 local WALK = true -- Walkable paths
-local YMAXMINP = 48 -- Maximum minp.y of generated chunks (-32 for default mapgen v6. 48, 128, 208 for higher)
+local YMAXMINP = 48 -- Maximum minp.y of generated chunks
+					-- (-32 for default mapgen v6. 48, 128, 208 for higher)
 local HSAMP = 0.85 -- Height select amplitude. Maximum steepness of paths
-local HSOFF = -0.2 -- Height select noise offset. Bias paths towards base (-) or higher (+) terrain
+local HSOFF = -0.2 -- Height select noise offset.
+					-- Bias paths towards base (-) or higher (+) terrain
 local TCOL = 0.3 -- Column noise threshold. Bridge column density
+
 
 -- Mapgen v6 parameters
 
@@ -22,7 +16,7 @@ local TCOL = 0.3 -- Column noise threshold. Bridge column density
 local np_base = {
 	offset = -4,
 	scale = 20,
-	spread = {x=250, y=250, z=250},
+	spread = {x = 250, y = 250, z = 250},
 	seed = 82341,
 	octaves = 5,
 	persist = 0.6
@@ -33,7 +27,7 @@ local np_base = {
 local np_higher = {
 	offset = 20,
 	scale = 16,
-	spread = {x=500, y=500, z=500},
+	spread = {x = 500, y = 500, z = 500},
 	seed = 85039,
 	octaves = 5,
 	persist = 0.6
@@ -44,7 +38,7 @@ local np_higher = {
 local np_hselect = {
 	offset = 0.5,
 	scale = 1,
-	spread = {x=250, y=250, z=250},
+	spread = {x = 250, y = 250, z = 250},
 	seed = 4213,
 	octaves = 5,
 	persist = 0.4 -- default = 0.69
@@ -55,7 +49,7 @@ local np_hselect = {
 local np_mud = {
 	offset = 4,
 	scale = 2,
-	spread = {x=200, y=200, z=200},
+	spread = {x = 200, y = 200, z = 200},
 	seed = 91013,
 	octaves = 3,
 	persist = 0.55
@@ -68,7 +62,7 @@ local np_mud = {
 local np_patha = {
 	offset = 0,
 	scale = 1,
-	spread = {x=1024, y=1024, z=1024},
+	spread = {x = 1024, y = 1024, z = 1024},
 	seed = 11711,
 	octaves = 3,
 	persist = 0.4
@@ -79,7 +73,7 @@ local np_patha = {
 local np_pathb = {
 	offset = 0,
 	scale = 1,
-	spread = {x=2048, y=2048, z=2048},
+	spread = {x = 2048, y = 2048, z = 2048},
 	seed = -8017,
 	octaves = 4,
 	persist = 0.4
@@ -90,7 +84,7 @@ local np_pathb = {
 local np_pathc = {
 	offset = 0,
 	scale = 1,
-	spread = {x=4096, y=4096, z=4096},
+	spread = {x = 4096, y = 4096, z = 4096},
 	seed = 300707,
 	octaves = 5,
 	persist = 0.4
@@ -101,7 +95,7 @@ local np_pathc = {
 local np_pathd = {
 	offset = 0,
 	scale = 1,
-	spread = {x=8192, y=8192, z=8192},
+	spread = {x = 8192, y = 8192, z = 8192},
 	seed = -80033,
 	octaves = 6,
 	persist = 0.4
@@ -112,15 +106,37 @@ local np_pathd = {
 local np_column = {
 	offset = 0,
 	scale = 1,
-	spread = {x=8, y=8, z=8},
+	spread = {x = 8, y = 8, z = 8},
 	seed = 1728833,
 	octaves = 3,
 	persist = 2
 }
 
--- Stuff
 
-dofile(minetest.get_modpath("pathv6alt").."/nodes.lua")
+-- Do files
+
+dofile(minetest.get_modpath("pathv6alt") .. "/nodes.lua")
+
+
+-- Set mapgen parameters
+
+minetest.register_on_mapgen_init(function(mgparams)
+	minetest.set_mapgen_params({flags="nolight"})
+end)
+
+
+-- Initialize noise objects to nil
+
+local nobj_base = nil
+local nobj_higher = nil
+local nobj_hselect = nil
+local nobj_mud = nil
+local nobj_patha = nil
+local nobj_pathb = nil
+local nobj_pathc = nil
+local nobj_pathd = nil
+local nobj_column = nil
+
 
 -- On generated function
 
@@ -137,7 +153,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local y0 = minp.y
 	local z0 = minp.z
 	
-	print ("[pathv6alt] chunk minp ("..x0.." "..y0.." "..z0..")")
+	--print ("[pathv6alt] minp (" .. x0 .. " " .. y0 .. " " .. z0 .. ")")
 	
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
@@ -173,22 +189,34 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	local sidelen = x1 - x0 + 1
 	local overlen = sidelen + 5 -- noisemap x, z from minp-3 to maxp+2
-	local chulens = {x=overlen, y=overlen, z=sidelen}
-	local minpos = {x=x0-3, y=z0-3}
+	local chulens = {x = overlen, y = overlen, z = 1}
+	local minpos = {x = x0 - 3, y = z0 - 3}
 
-	local nvals_base = minetest.get_perlin_map(np_base, chulens):get2dMap_flat({x=x0+122, y=z0+122}) -- noisemap offsets - 3
-	local nvals_higher = minetest.get_perlin_map(np_higher, chulens):get2dMap_flat({x=x0+247, y=z0+247})
-	local nvals_hselect = minetest.get_perlin_map(np_hselect, chulens):get2dMap_flat({x=x0+122, y=z0+122})
-	local nvals_mud = minetest.get_perlin_map(np_mud, chulens):get2dMap_flat({x=x0+97, y=z0+97})
+	nobj_base = nobj_base or minetest.get_perlin_map(np_base, chulens)
+	nobj_higher = nobj_higher or minetest.get_perlin_map(np_higher, chulens)
+	nobj_hselect = nobj_hselect or minetest.get_perlin_map(np_hselect, chulens)
+	nobj_mud = nobj_mud or minetest.get_perlin_map(np_mud, chulens)
 
-	local nvals_patha = minetest.get_perlin_map(np_patha, chulens):get2dMap_flat(minpos)
-	local nvals_pathb = minetest.get_perlin_map(np_pathb, chulens):get2dMap_flat(minpos)
-	local nvals_pathc = minetest.get_perlin_map(np_pathc, chulens):get2dMap_flat(minpos)
-	local nvals_pathd = minetest.get_perlin_map(np_pathd, chulens):get2dMap_flat(minpos)
-	local nvals_column = minetest.get_perlin_map(np_column, chulens):get2dMap_flat(minpos)
+	nobj_patha = nobj_patha or minetest.get_perlin_map(np_patha, chulens)
+	nobj_pathb = nobj_pathb or minetest.get_perlin_map(np_pathb, chulens)
+	nobj_pathc = nobj_pathc or minetest.get_perlin_map(np_pathc, chulens)
+	nobj_pathd = nobj_pathd or minetest.get_perlin_map(np_pathd, chulens)
+	nobj_column = nobj_column or minetest.get_perlin_map(np_column, chulens)
+	
+	-- these 4 minpos are mgv6 noise offsets - 3
+	local nvals_base = nobj_base:get2dMap_flat({x = x0 + 122, y = z0 + 122})
+	local nvals_higher = nobj_higher:get2dMap_flat({x = x0 + 247, y = z0 + 247})
+	local nvals_hselect = nobj_hselect:get2dMap_flat({x = x0 + 122, y = z0 + 122})
+	local nvals_mud = nobj_mud:get2dMap_flat({x = x0 + 97, y = z0 + 97})
+
+	local nvals_patha = nobj_patha:get2dMap_flat(minpos)
+	local nvals_pathb = nobj_pathb:get2dMap_flat(minpos)
+	local nvals_pathc = nobj_pathc:get2dMap_flat(minpos)
+	local nvals_pathd = nobj_pathd:get2dMap_flat(minpos)
+	local nvals_column = nobj_column:get2dMap_flat(minpos)
 	
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local area = VoxelArea:new({MinEdge=emin, MaxEdge=emax})
+	local area = VoxelArea:new({MinEdge = emin, MaxEdge = emax})
 	local data = vm:get_data()
 	local emerlen = sidelen + 32
 
@@ -199,7 +227,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local n_xprepathb = false
 		local n_xprepathc = false
 		local n_xprepathd = false
-		for x = x0 - 3, x1 + 2 do -- x0-3, z0-3 is to setup initial values of 'xprepath_', 'zprepath_'
+		-- x0-3, z0-3 is to setup initial values of 'xprepath_', 'zprepath_'
+		for x = x0 - 3, x1 + 2 do
 			local n_patha = nvals_patha[ni]
 			local n_zprepatha = nvals_patha[(ni - overlen)]
 
@@ -212,7 +241,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			local n_pathd = nvals_pathd[ni]
 			local n_zprepathd = nvals_pathd[(ni - overlen)]
 
-			if x >= x0 - 2 and z >= z0 - 2 then -- paths overgenerate by 2 nodes to erase mudflow griefing
+			-- paths overgenerate by 2 nodes to erase mudflow griefing
+			if x >= x0 - 2 and z >= z0 - 2 then
 				local abscol = math.abs(nvals_column[ni])
 				local base = nvals_base[ni]
 				local higher = nvals_higher[ni]
@@ -226,10 +256,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				local tlevel = base * (1 - tblend) + higher * tblend + mudadd
 				local pathy = math.floor(math.max(tlevel, 6))
 
-				if (n_patha >= 0 and n_xprepatha < 0) or (n_patha < 0 and n_xprepatha >= 0) -- patha
-				or (n_patha >= 0 and n_zprepatha < 0) or (n_patha < 0 and n_zprepatha >= 0)
-				or (n_pathb >= 0 and n_xprepathb < 0) or (n_pathb < 0 and n_xprepathb >= 0) -- pathb
-				or (n_pathb >= 0 and n_zprepathb < 0) or (n_pathb < 0 and n_zprepathb >= 0) then
+				-- paths a and b
+				if (n_patha >= 0 and n_xprepatha < 0)
+				or (n_patha < 0 and n_xprepatha >= 0)
+				or (n_patha >= 0 and n_zprepatha < 0)
+				or (n_patha < 0 and n_zprepatha >= 0)
+				or (n_pathb >= 0 and n_xprepathb < 0)
+				or (n_pathb < 0 and n_xprepathb >= 0)
+				or (n_pathb >= 0 and n_zprepathb < 0)
+				or (n_pathb < 0 and n_zprepathb >= 0) then
 					if pathy > y1 then -- build columns through this chunk
 						if abscol < TCOL then
 							local vi = area:index(x, y1, z)
@@ -247,7 +282,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif pathy >= y0 then -- path in chunk, place path node brush
 						local wood = true -- scan disk at path level for ground
 						for k = -1, 1 do
-							local vi = area:index(x-1, pathy, z+k)
+							local vi = area:index(x - 1, pathy, z + k)
 							for i = -1, 1 do
 								local nodid = data[vi]
 								if nodid == c_sand
@@ -265,7 +300,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						local tunnel = false -- scan disk above path for stone
 						local excatop
 						for k = -1, 1 do
-							local vi = area:index(x-1, pathy+5, z+k)
+							local vi = area:index(x - 1, pathy + 5, z + k)
 							for i = -1, 1 do
 								local nodid = data[vi]
 								if nodid == c_stone
@@ -283,7 +318,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 						if WALK then
 							if wood then
-								local vi = area:index(x-1, pathy, z-1)
+								local vi = area:index(x - 1, pathy, z - 1)
 								if data[vi] ~= c_wood
 								and data[vi] ~= c_path then
 									data[vi] = c_stairne
@@ -299,7 +334,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_stairnw
 								end
 	
-								local vi = area:index(x-1, pathy, z)
+								local vi = area:index(x - 1, pathy, z)
 								if data[vi] ~= c_wood
 								and data[vi] ~= c_path then
 									data[vi] = c_staire
@@ -312,7 +347,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_stairw
 								end
 	
-								local vi = area:index(x-1, pathy, z+1)
+								local vi = area:index(x - 1, pathy, z + 1)
 								if data[vi] ~= c_wood
 								and data[vi] ~= c_path then
 									data[vi] = c_stairse
@@ -328,7 +363,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_stairsw
 								end
 							else
-								local vi = area:index(x-1, pathy, z-1)
+								local vi = area:index(x - 1, pathy, z - 1)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_pstairne
@@ -344,7 +379,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_pstairnw
 								end
 	
-								local vi = area:index(x-1, pathy, z)
+								local vi = area:index(x - 1, pathy, z)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_pstaire
@@ -357,7 +392,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_pstairw
 								end
 	
-								local vi = area:index(x-1, pathy, z+1)
+								local vi = area:index(x - 1, pathy, z + 1)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_pstairse
@@ -376,7 +411,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 							for y = pathy + 1, excatop do
 								for k = -1, 1 do
-									local vi = area:index(x-1, y, z+k)
+									local vi = area:index(x - 1, y, z + k)
 									for i = -1, 1 do
 										local nodid = data[vi]
 										if y == excatop then
@@ -415,7 +450,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						else -- non walkable option
 							for y = pathy, excatop do
 								for k = -1, 1 do
-									local vi = area:index(x-1, y, z+k)
+									local vi = area:index(x - 1, y, z + k)
 									for i = -1, 1 do
 										local nodid = data[vi]
 										if y == pathy then
@@ -455,15 +490,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							end
 						end
 					end
-				elseif (n_pathc >= 0 and n_xprepathc < 0) or (n_pathc < 0 and n_xprepathc >= 0) -- pathc
-				or (n_pathc >= 0 and n_zprepathc < 0) or (n_pathc < 0 and n_zprepathc >= 0)
-				or (n_pathd >= 0 and n_xprepathd < 0) or (n_pathd < 0 and n_xprepathd >= 0) -- pathd
-				or (n_pathd >= 0 and n_zprepathd < 0) or (n_pathd < 0 and n_zprepathd >= 0) then
+				-- paths c and d
+				elseif (n_pathc >= 0 and n_xprepathc < 0)
+				or (n_pathc < 0 and n_xprepathc >= 0)
+				or (n_pathc >= 0 and n_zprepathc < 0)
+				or (n_pathc < 0 and n_zprepathc >= 0)
+				or (n_pathd >= 0 and n_xprepathd < 0)
+				or (n_pathd < 0 and n_xprepathd >= 0)
+				or (n_pathd >= 0 and n_zprepathd < 0)
+				or (n_pathd < 0 and n_zprepathd >= 0) then
 					if pathy > y1 then -- build columns through this chunk
 						if abscol < TCOL then
 							for i = -1, 1, 2 do
 							for k = -1, 1, 2 do
-								local vi = area:index(x+i, y1, z+k)
+								local vi = area:index(x + i, y1, z + k)
 								for y = 1, sidelen do
 									local nodid = data[vi]
 									if nodid == c_stone
@@ -480,7 +520,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					elseif pathy >= y0 then -- path in chunk, place path node brush
 						local wood = true -- scan disk at path level for ground
 						for k = -2, 2 do
-							local vi = area:index(x-2, pathy, z+k)
+							local vi = area:index(x - 2, pathy, z + k)
 							for i = -2, 2 do
 								local nodid = data[vi]
 								if nodid == c_sand
@@ -498,7 +538,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						local tunnel = false -- scan disk above path for stone
 						local excatop
 						for k = -2, 2 do
-							local vi = area:index(x-2, pathy+5, z+k)
+							local vi = area:index(x - 2, pathy + 5, z + k)
 							for i = -2, 2 do
 								local nodid = data[vi]
 								if nodid == c_stone
@@ -517,7 +557,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 						if WALK then
 							if wood then
-								local vi = area:index(x-2, pathy, z-2)
+								local vi = area:index(x - 2, pathy, z - 2)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_stairne
@@ -536,7 +576,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								end
 	
 								for k = -1, 1 do
-									local vi = area:index(x-2, pathy, z+k)
+									local vi = area:index(x - 2, pathy, z + k)
 									if data[vi] ~= c_path
 									and data[vi] ~= c_wood then
 										data[vi] = c_staire
@@ -552,7 +592,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									end
 								end
 	
-								local vi = area:index(x-2, pathy, z+2)
+								local vi = area:index(x - 2, pathy, z + 2)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_stairse
@@ -570,7 +610,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									data[vi] = c_stairsw
 								end
 							else
-								local vi = area:index(x-2, pathy, z-2)
+								local vi = area:index(x - 2, pathy, z - 2)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_pstairne
@@ -589,7 +629,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 								end
 	
 								for k = -1, 1 do
-									local vi = area:index(x-2, pathy, z+k)
+									local vi = area:index(x - 2, pathy, z + k)
 									if data[vi] ~= c_path
 									and data[vi] ~= c_wood then
 										data[vi] = c_pstaire
@@ -605,7 +645,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 									end
 								end
 	
-								local vi = area:index(x-2, pathy, z+2)
+								local vi = area:index(x - 2, pathy, z + 2)
 								if data[vi] ~= c_path
 								and data[vi] ~= c_wood then
 									data[vi] = c_pstairse
@@ -626,7 +666,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 							for y = pathy + 1, excatop do
 								for k = -2, 2 do
-									local vi = area:index(x-2, y, z+k)
+									local vi = area:index(x - 2, y, z + k)
 									for i = -2, 2 do
 										local nodid = data[vi]
 										if y == excatop then
@@ -665,7 +705,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 						else -- non walkable option
 							for y = pathy, excatop do
 								for k = -2, 2 do
-									local vi = area:index(x-2, y, z+k)
+									local vi = area:index(x - 2, y, z + k)
 									for i = -2, 2 do
 										if math.abs(k) + math.abs(i) <= 3 then
 											local nodid = data[vi]
@@ -690,7 +730,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							for i = -1, 1 do -- bridge structure
 							for k = -1, 1 do
 								if not (i == 0 and k == 0) then
-									local vi = area:index(x+i, pathy-1, z+k)
+									local vi = area:index(x + i, pathy - 1, z + k)
 									for y = 1, 2 do
 										data[vi] = c_column
 										vi = vi - emerlen
@@ -702,7 +742,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 							if abscol < TCOL then -- columns
 								for i = -1, 1, 2 do
 								for k = -1, 1, 2 do
-									local vi = area:index(x+i, pathy-3, z+k)
+									local vi = area:index(x + i, pathy - 3, z + k)
 									for y = pathy - 3, y0, -1 do
 										local nodid = data[vi]
 										if nodid == c_stone
@@ -730,11 +770,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	
 	vm:set_data(data)
-	vm:set_lighting({day=0, night=0})
 	vm:calc_lighting()
 	vm:write_to_map(data)
 
 	local chugent = math.ceil((os.clock() - t1) * 1000)
-	print ("[pathv6alt] "..chugent.." ms")
+	print ("[pathv6alt] " .. chugent .. " ms")
 end)
-

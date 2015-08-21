@@ -2,7 +2,7 @@ minetest.register_node("pathv6alt:junglewood", {
 	description = "Mod jungle wood",
 	tiles = {"default_junglewood.png"},
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	sounds = default.node_sound_wood_defaults(),
 })
 
@@ -10,7 +10,7 @@ minetest.register_node("pathv6alt:path", {
 	description = "Dirt path",
 	tiles = {"pathv6alt_path.png"},
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -18,17 +18,17 @@ minetest.register_node("pathv6alt:bridgewood", {
 	description = "Bridge wood",
 	tiles = {"pathv6alt_bridgewood.png"},
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	sounds = default.node_sound_wood_defaults(),
 })
 
 minetest.register_node("pathv6alt:stairn", { -- stair rising to the north
-	description = "Stair north",
+	description = "Jungle wood stair N",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -40,12 +40,12 @@ minetest.register_node("pathv6alt:stairn", { -- stair rising to the north
 })
 
 minetest.register_node("pathv6alt:stairs", {
-	description = "Stair south",
+	description = "Jungle wood stair S",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -57,12 +57,12 @@ minetest.register_node("pathv6alt:stairs", {
 })
 
 minetest.register_node("pathv6alt:staire", {
-	description = "Stair east",
+	description = "Jungle wood stair E",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -74,12 +74,12 @@ minetest.register_node("pathv6alt:staire", {
 })
 
 minetest.register_node("pathv6alt:stairw", {
-	description = "Stair west",
+	description = "Jungle wood stair W",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -91,12 +91,12 @@ minetest.register_node("pathv6alt:stairw", {
 })
 
 minetest.register_node("pathv6alt:stairne", {
-	description = "Stair north east",
+	description = "Jungle wood stair NE",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -108,12 +108,12 @@ minetest.register_node("pathv6alt:stairne", {
 })
 
 minetest.register_node("pathv6alt:stairnw", {
-	description = "Stair north west",
+	description = "Jungle wood stair NW",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -125,12 +125,12 @@ minetest.register_node("pathv6alt:stairnw", {
 })
 
 minetest.register_node("pathv6alt:stairse", {
-	description = "Stair south east",
+	description = "Jungle wood stair SE",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -142,12 +142,12 @@ minetest.register_node("pathv6alt:stairse", {
 })
 
 minetest.register_node("pathv6alt:stairsw", {
-	description = "Stair south west",
+	description = "Jungle wood stair SW",
 	tiles = {"default_junglewood.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {choppy=2,oddly_breakable_by_hand=2,flammable=3,wood=1},
+	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -159,12 +159,12 @@ minetest.register_node("pathv6alt:stairsw", {
 })
 
 minetest.register_node("pathv6alt:pstairn", {
-	description = "Stair north",
+	description = "Dirt stair N",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -177,12 +177,12 @@ minetest.register_node("pathv6alt:pstairn", {
 })
 
 minetest.register_node("pathv6alt:pstairs", {
-	description = "Stair south",
+	description = "Dirt stair S",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -195,12 +195,12 @@ minetest.register_node("pathv6alt:pstairs", {
 })
 
 minetest.register_node("pathv6alt:pstaire", {
-	description = "Stair east",
+	description = "Dirt stair E",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -213,12 +213,12 @@ minetest.register_node("pathv6alt:pstaire", {
 })
 
 minetest.register_node("pathv6alt:pstairw", {
-	description = "Stair west",
+	description = "Dirt stair W",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -231,12 +231,12 @@ minetest.register_node("pathv6alt:pstairw", {
 })
 
 minetest.register_node("pathv6alt:pstairne", {
-	description = "Stair north east",
+	description = "Dirt stair NE",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -249,12 +249,12 @@ minetest.register_node("pathv6alt:pstairne", {
 })
 
 minetest.register_node("pathv6alt:pstairnw", {
-	description = "Stair north west",
+	description = "Dirt stair NW",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -267,12 +267,12 @@ minetest.register_node("pathv6alt:pstairnw", {
 })
 
 minetest.register_node("pathv6alt:pstairse", {
-	description = "Stair south east",
+	description = "Dirt stair SE",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
@@ -285,12 +285,12 @@ minetest.register_node("pathv6alt:pstairse", {
 })
 
 minetest.register_node("pathv6alt:pstairsw", {
-	description = "Stair south west",
+	description = "Dirt stair SW",
 	tiles = {"pathv6alt_path.png"},
 	drawtype = "nodebox",
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {crumbly=2},
+	groups = {crumbly = 2},
 	drop = "default:dirt",
 	node_box = {
 		type = "fixed",
