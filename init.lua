@@ -118,13 +118,6 @@ local np_column = {
 dofile(minetest.get_modpath("pathv6alt") .. "/nodes.lua")
 
 
--- Set mapgen parameters
-
-minetest.register_on_mapgen_init(function(mgparams)
-	minetest.set_mapgen_params({flags="nolight"})
-end)
-
-
 -- Initialize noise objects to nil
 
 local nobj_base = nil
@@ -152,8 +145,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local x0 = minp.x
 	local y0 = minp.y
 	local z0 = minp.z
-	
-	--print ("[pathv6alt] minp (" .. x0 .. " " .. y0 .. " " .. z0 .. ")")
 	
 	local c_air = minetest.get_content_id("air")
 	local c_ignore = minetest.get_content_id("ignore")
@@ -770,6 +761,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	
 	vm:set_data(data)
+	vm:set_lighting({day = 0, night = 0})
 	vm:calc_lighting()
 	vm:write_to_map(data)
 

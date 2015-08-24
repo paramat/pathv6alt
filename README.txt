@@ -1,4 +1,4 @@
-pathv6alt 0.3.0 by paramat
+pathv6alt 0.3.1 by paramat
 For Minetest 0.4.12 and later
 Depends default stairs
 Licenses: Code LGPLv2.1, textures CC BY-SA 3.0
